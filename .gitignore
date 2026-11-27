@@ -15,6 +15,7 @@ backups/
 *.mp4
 *.png
 !icon.png
+!docs/*.png
 *.jpg
 *.jpeg
 *.bmp
