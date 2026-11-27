@@ -1,0 +1,36 @@
+# 빌드 결과물 — build.cmd 로 다시 만든다(배포 파일은 노션 페이지에 첨부)
+*.exe
+*.pdb
+*.dll
+bin/
+obj/
+.vs/
+
+# 작업 전 백업·배포 묶음
+backups/
+*.zip
+
+# 녹화·캡쳐 결과물과 시험 산출물(아이콘 원본 icon.png 는 올린다)
+*.gif
+*.mp4
+*.png
+!icon.png
+*.jpg
+*.jpeg
+*.bmp
+*.raw
+
+# 설정·비밀 정보
+settings.ini
+.env
+*.env
+*.key
+*.pem
+
+# 임시·편집기 파일
+*.tmp
+*.log
+*~
+Thumbs.db
+desktop.ini
+__pycache__/
