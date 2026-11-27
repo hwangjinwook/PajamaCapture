@@ -67,16 +67,6 @@
 - **가장 쉬운 방법:** 프로그램의 **ffmpeg 설치** 단추를 눌러요. 명령 창이 열려 설치가 진행돼요(`winget install -e --id Gyan.FFmpeg`). 끝나면 그 창을 닫고 파자마캡쳐 창으로 돌아오면 자동으로 다시 찾아요.
 - **직접 받기:** [ffmpeg 내려받기 페이지](https://www.gyan.dev/ffmpeg/builds/)에서 `ffmpeg-release-essentials.zip` 을 받아 압축을 풀고, 그 안의 `bin\ffmpeg.exe` 를 `파자마캡쳐.exe` 옆에 두거나 **직접 지정…** 으로 골라요.
 
-## 💾 저장 위치
-
-- 찍은 그림과 녹화는 **저장 폴더**(기본 `사진\파자마 캡쳐`)에 `파자마캡쳐_날짜_시각.png / .gif / .mp4` 로 저장돼요. 메인 창에서 바꾸거나 바로 열 수 있어요.
-- 설정은 `%APPDATA%\PajamaCapture\settings.ini` 에 저장돼요. 프로그램 폴더를 옮기거나 지워도 남아요.
-- 지우려면 `파자마캡쳐` 폴더를 지우면 돼요. 설정까지 지우려면 `%APPDATA%\PajamaCapture` 도 지우세요.
-
-## 🔄 새 버전으로 바꾸기
-
-켜 둔 파자마캡쳐를 끄고, 새 zip 의 `파자마캡쳐.exe` 로 바꿔 넣으면 돼요. 설정은 그대로 이어져요.
-
 ## 📜 버전 기록
 
 <table>
@@ -87,13 +77,3 @@
 <tr><td nowrap>v1.0.1</td><td nowrap>2026-11-07</td><td>찍기 전 기다림(타이머) 설정을 빼고, 창 오른쪽 위에 버전 표시</td></tr>
 <tr><td nowrap>v1.0.0</td><td nowrap>2026-11-07</td><td>첫 버전 — 영역 캡쳐·창 캡쳐·GIF/MP4 녹화</td></tr>
 </table>
-
----
-
-<details>
-<summary>🛠 직접 빌드하기</summary>
-
-`build.cmd` 를 실행하면 윈도우에 기본으로 있는 C# 컴파일러로 `파자마캡쳐.exe` 를 만들어요(설치할 것 없음). 시험은 `tests\run-tests.cmd` 예요.
-파일 구성, 시험 내용, 기능별 자세한 설명은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) 에 있어요.
-
-</details>
