@@ -10,7 +10,7 @@ using PinkUi;
 
 namespace PajamaCapture
 {
-    enum OverlayMode { Area, Window, Record }
+    enum OverlayMode { Area, Window }
     enum OverlayAction { Cancel, Copy, Save, Record }
 
     sealed class Overlay : Form
@@ -187,7 +187,6 @@ namespace PajamaCapture
         string HintText()
         {
             if (mode == OverlayMode.Window) return "캡쳐할 창을 클릭하세요  ·  Esc 취소";
-            if (mode == OverlayMode.Record) return "녹화할 영역을 끌어서 정하거나 창을 클릭하세요  ·  Esc 취소";
             return "끌어서 영역을 정하세요  ·  창 위에서 클릭하면 창 범위  ·  Esc 취소";
         }
 
@@ -226,16 +225,9 @@ namespace PajamaCapture
         {
             buttons.Clear();
             if (!hasSel || drag != DragKind.None) return;
-            if (mode == OverlayMode.Record)
-            {
-                Add("● 녹화 시작", OverlayAction.Record, true);
-            }
-            else
-            {
-                Add("복사  (Enter)", OverlayAction.Copy, true);
-                Add("저장…", OverlayAction.Save, false);
-                Add("● 녹화", OverlayAction.Record, false);
-            }
+            Add("복사  (Enter)", OverlayAction.Copy, true);
+            Add("저장…", OverlayAction.Save, false);
+            Add("● 녹화", OverlayAction.Record, false); // 고른 범위를 그대로 녹화(끌어서 범위 정해 녹화하는 유일한 길)
             Add("취소", OverlayAction.Cancel, false);
 
             int gap = S(6), h = S(34), total = -gap;
@@ -510,7 +502,7 @@ namespace PajamaCapture
         {
             base.OnMouseDoubleClick(e);
             if (e.Button == MouseButtons.Left && hasSel && sel.Contains(e.Location) && mode != OverlayMode.Window)
-                Finish(PrimaryAction);
+                Finish(OverlayAction.Copy);
         }
 
         Point ClampPoint(Point p)
@@ -533,16 +525,14 @@ namespace PajamaCapture
             else Cursor = Cursors.Cross;
         }
 
-        // ── 키보드: Enter 확정, Esc 취소, 화살표 1점 이동(Shift 는 크기) ──
-
-        OverlayAction PrimaryAction { get { return mode == OverlayMode.Record ? OverlayAction.Record : OverlayAction.Copy; } }
+        // ── 키보드: Enter 복사, Esc 취소, 화살표 1점 이동(Shift 는 크기) ──
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             Keys key = keyData & Keys.KeyCode;
             bool shift = (keyData & Keys.Shift) != 0;
             if (key == Keys.Escape) { Finish(OverlayAction.Cancel); return true; }
-            if (key == Keys.Enter && hasSel) { Finish(PrimaryAction); return true; }
+            if (key == Keys.Enter && hasSel) { Finish(OverlayAction.Copy); return true; }
             if (hasSel && (key == Keys.Left || key == Keys.Right || key == Keys.Up || key == Keys.Down))
             {
                 int dx = key == Keys.Left ? -1 : key == Keys.Right ? 1 : 0;

@@ -1,5 +1,5 @@
 // 시험용 실행 방식 — 사람이 마우스를 움직이지 않아도 화면 그리기·창 찾기·녹화를 확인한다.
-//   파자마캡쳐.exe --selftest overlay <저장.png> <area|window|record> [hover]
+//   파자마캡쳐.exe --selftest overlay <저장.png> <area|window> [hover]
 //   파자마캡쳐.exe --selftest main <저장.png>
 //   파자마캡쳐.exe --selftest windows
 //   파자마캡쳐.exe --selftest record <gif|mp4> <초> <저장 파일> [ffmpeg.exe] [x y w h]
@@ -56,7 +56,7 @@ namespace PajamaCapture
             Rectangle virt = Native.VirtualScreen;
             var windows = WindowFinder.List(virt);
             using (var shot = ScreenCapturer.Snap(virt))
-            using (var ov = new Overlay(mode == "window" ? OverlayMode.Window : mode == "record" ? OverlayMode.Record : OverlayMode.Area, shot, virt, windows))
+            using (var ov = new Overlay(mode == "window" ? OverlayMode.Window : OverlayMode.Area, shot, virt, windows))
             {
                 Rectangle primary = Screen.PrimaryScreen.Bounds;
                 if (hover) ov.TestHover(new Point(primary.X + primary.Width / 2, primary.Y + primary.Height / 2));

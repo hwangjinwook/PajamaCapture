@@ -116,14 +116,17 @@ static class UiDriver
             target = null;
             Thread.Sleep(600);
 
-            // 3) 녹화(GIF): 범위를 끌어 정하고 Enter → 2초 뒤 막대의 「정지」
-            Console.WriteLine("[녹화]");
+            // 3) 녹화(GIF): 영역 캡쳐에서 범위를 끌어 정하고 도구 막대의 「● 녹화」 → 2초 뒤 막대의 「정지」
+            //    (메인 창의 「끌어서 범위」 녹화 버튼은 v1.2.1 에서 없앴다 — 같은 일을 영역 캡쳐가 한다)
+            Console.WriteLine("[녹화 — 영역 캡쳐의 ● 녹화]");
             main = FindWindow(app.Id, "파자마 캡쳐");
-            Invoke(main, "● 녹화");
+            Check(!HasButton(main, "● 녹화"), "메인 창에 「● 녹화(끌어서 범위)」 버튼이 없음");
+            Invoke(main, "영역 캡쳐");
             Thread.Sleep(900);
             Drag(prim.X + 400, prim.Y + 300, prim.X + 800, prim.Y + 540);
-            Thread.Sleep(250);
-            Key(0x0D);
+            Thread.Sleep(350);
+            Point rec = ToolbarButton(Rectangle.FromLTRB(prim.X + 400, prim.Y + 300, prim.X + 801, prim.Y + 541), 2);
+            Click(rec.X, rec.Y);
             Thread.Sleep(2200);
             AutomationElement bar = WaitFor(() => FindWindow(app.Id, "파자마 캡쳐 - 녹화 중"), 3000);
             Check(bar != null, "녹화 막대가 뜸");
@@ -291,6 +294,33 @@ static class UiDriver
         Application.DoEvents();
         Thread.Sleep(600);
         return gif ?? lastGif;
+    }
+
+    static bool HasButton(AutomationElement window, string startsWith)
+    {
+        foreach (AutomationElement b in window.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button)))
+            if (b.Current.Name.StartsWith(startsWith)) return true;
+        return false;
+    }
+
+    /// <summary>영역 캡쳐 도구 막대의 index 번째 단추 가운데(화면 좌표). 그림으로만 그려지는 단추라 src\Overlay.cs 의 LayoutButtons 와 같은 계산을 한다.</summary>
+    static Point ToolbarButton(Rectangle sel, int index)
+    {
+        Point c = new Point(sel.X + sel.Width / 2, sel.Y + sel.Height / 2);
+        float scale = Math.Max(1f, DpiAt(c) / 96f);
+        Func<float, int> S = px => (int)Math.Round(px * scale);
+        string[] texts = { "복사  (Enter)", "저장…", "● 녹화", "취소" };
+        var widths = new int[texts.Length];
+        int gap = S(6), h = S(34), pad = S(6), total = -gap;
+        using (var bold = new Font("Malgun Gothic", 13f * scale, FontStyle.Bold, GraphicsUnit.Pixel))
+            for (int i = 0; i < texts.Length; i++) { widths[i] = TextRenderer.MeasureText(texts[i], bold).Width + S(24); total += widths[i] + gap; }
+        Rectangle m = Screen.FromPoint(c).Bounds;
+        int x = Math.Max(m.Left + pad, Math.Min(sel.Right - total, m.Right - total - pad));
+        int y = sel.Bottom + S(10);
+        if (y + h + pad > m.Bottom) y = sel.Top - S(10) - h;
+        if (y < m.Top + pad) y = sel.Bottom - S(10) - h;
+        for (int i = 0; i < index; i++) x += widths[i] + gap;
+        return new Point(x + widths[index] / 2, y + h / 2);
     }
 
     static AutomationElement FindWindow(int pid, string title)

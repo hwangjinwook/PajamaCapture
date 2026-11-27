@@ -1,4 +1,4 @@
-// 파자마 캡쳐 메인 창 — 영역 캡쳐·창 캡쳐·녹화 버튼과 설정, 그리고 찍기→고르기→저장 흐름.
+// 파자마 캡쳐 메인 창 — 영역 캡쳐·창 캡쳐·녹화 틀 버튼과 설정, 그리고 찍기→고르기→저장(또는 녹화) 흐름.
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,7 +24,7 @@ namespace PajamaCapture
     static class Program
     {
         /// <summary>프로그램 버전. 바꾼 뒤 build.cmd 로 exe 를 다시 만든다.</summary>
-        public const string Version = "1.2.0";
+        public const string Version = "1.2.1";
 
         [STAThread]
         static int Main(string[] args)
@@ -129,7 +129,7 @@ namespace PajamaCapture
         public const string AppTitle = "파자마 캡쳐";
 
         readonly Settings settings = Settings.Load();
-        readonly Button btnArea = new Button(), btnWindow = new Button(), btnRecord = new Button(), btnFrame = new Button();
+        readonly Button btnArea = new Button(), btnWindow = new Button(), btnFrame = new Button();
         readonly ComboBox cbFormat = new ComboBox(), cbFps = new ComboBox();
         readonly CheckBox chkAutoSave = new PinkCheckBox(), chkCursor = new PinkCheckBox();
         readonly TextBox tbFolder = new TextBox();
@@ -146,7 +146,7 @@ namespace PajamaCapture
         RecordBar recordBar;
         FrameWindow frameWindow; // 녹화 틀(꿀캠 방식) — 열려 있는 동안만
 
-        const string RecordText = "● 녹화\n끌어서 범위", FrameText = "▣ 녹화 틀\n크기 먼저 맞추기", FrameCloseText = "▣ 녹화 틀 닫기";
+        const string FrameText = "▣ 녹화 틀\n크기 먼저 맞추기", FrameCloseText = "▣ 녹화 틀\n닫기";
 
         public MainForm()
         {
@@ -167,15 +167,8 @@ namespace PajamaCapture
 
             SetupBig(btnArea, "영역 캡쳐", "끌어서 범위 지정", 16);
             SetupBig(btnWindow, "창 캡쳐", "클릭해서 창 찍기", 168);
-            SetupBig(btnRecord, "● 녹화", "끌어서 범위", 320);
-            // 녹화 칸은 위아래 둘로 — 위: 끌어서 범위 정하고 바로 녹화(기존), 아래: 녹화 틀을 먼저 띄워 크기를 맞추고 녹화(꿀캠 방식)
-            btnRecord.Bounds = new Rectangle(320, 76, 140, 40);
-            btnRecord.Font = new Font("Malgun Gothic", 9f, FontStyle.Bold);
-            btnRecord.Text = RecordText;
-            btnFrame.Bounds = new Rectangle(320, 118, 140, 40);
-            btnFrame.Font = new Font("Malgun Gothic", 9f, FontStyle.Bold);
-            btnFrame.Text = FrameText;
-            btnFrame.Tag = PinkTheme.PrimaryTag;
+            // 녹화는 녹화 틀(꿀캠 방식)로 한다. 끌어서 범위를 정해 녹화하려면 영역 캡쳐 도구 막대의 「● 녹화」를 쓴다.
+            SetupBig(btnFrame, "▣ 녹화 틀", "크기 먼저 맞추기", 320);
 
             // 캡쳐 설정
             var gCapture = new PinkGroupBox { Text = "캡쳐 설정", Bounds = new Rectangle(16, 170, 444, 62) };
@@ -231,7 +224,7 @@ namespace PajamaCapture
             // 버전 — 제목 줄 오른쪽 끝에 흐린 글씨로(위치는 배율이 적용된 뒤 아래에서 맞춘다)
             var version = new Label { Name = "version", Text = "v" + Program.Version, AccessibleName = "버전 " + Program.Version, AutoSize = true };
 
-            Controls.AddRange(new Control[] { title, sub, version, btnArea, btnWindow, btnRecord, btnFrame, gCapture, gRecord, gEdit, gFolder, status });
+            Controls.AddRange(new Control[] { title, sub, version, btnArea, btnWindow, btnFrame, gCapture, gRecord, gEdit, gFolder, status });
             ResumeLayout(false);
             PinkTheme.Apply(this);
             title.ForeColor = PinkTheme.Accent;
@@ -255,7 +248,6 @@ namespace PajamaCapture
             // 이벤트
             btnArea.Click += (s, e) => StartPick(OverlayMode.Area);
             btnWindow.Click += (s, e) => StartPick(OverlayMode.Window);
-            btnRecord.Click += (s, e) => { if (recorder != null) StopRecording(false); else StartPick(OverlayMode.Record); };
             btnFrame.Click += (s, e) => ToggleFrame();
             chkAutoSave.CheckedChanged += (s, e) => { settings.AutoSave = chkAutoSave.Checked; settings.Save(); };
             cbFormat.SelectedIndexChanged += (s, e) => { settings.Mp4 = cbFormat.SelectedIndex == 1; settings.Save(); RefreshFfmpeg(); SyncFrameFormat(); };
@@ -368,7 +360,6 @@ namespace PajamaCapture
         void StartPick(OverlayMode mode)
         {
             if (busy) return;
-            if (mode == OverlayMode.Record && settings.Mp4 && !EnsureFfmpegOrGif()) return;
             busy = true;
             SetButtons(false);
             Hide(); // 이 창이 찍히지 않게 숨기고, 사라질 시간을 준 뒤 찍는다
@@ -426,7 +417,13 @@ namespace PajamaCapture
             try
             {
                 if (action == OverlayAction.Cancel) { shot.Dispose(); Done(); SetStatus("취소했어요."); return; }
-                if (action == OverlayAction.Record) { shot.Dispose(); StartRecording(rect); return; }
+                if (action == OverlayAction.Record) // 영역 캡쳐 도구 막대의 「● 녹화」 — 고른 범위 그대로 녹화
+                {
+                    shot.Dispose();
+                    if (settings.Mp4 && !EnsureFfmpegOrGif()) { Done(); SetStatus("녹화를 그만뒀어요."); return; }
+                    StartRecording(rect);
+                    return;
+                }
 
                 var local = rect;
                 local.Offset(-virt.X, -virt.Y);
@@ -504,7 +501,6 @@ namespace PajamaCapture
             bool frameOpen = frameWindow != null; // 녹화 틀이 떠 있는 동안에는 다른 찍기를 막고, 틀 버튼은 「닫기」가 된다
             btnArea.Enabled = on && !frameOpen;
             btnWindow.Enabled = on && !frameOpen;
-            btnRecord.Enabled = (on || recorder != null) && !frameOpen;
             btnFrame.Enabled = on && recorder == null;
             btnFrame.Text = frameOpen ? FrameCloseText : FrameText;
         }
@@ -601,7 +597,6 @@ namespace PajamaCapture
             recordBar.StopClicked += (s, e) => StopRecording(false);
             recordBar.CancelClicked += (s, e) => StopRecording(true);
             recordBar.Show();
-            btnRecord.Text = "■ 녹화 정지\n저장하기";
             SetButtons(false);
             SetStatus("녹화 중이에요. 막대의 「정지」를 누르면 저장해요.");
         }
@@ -624,7 +619,6 @@ namespace PajamaCapture
             if (recordFrame != null) { recordFrame.Close(); recordFrame = null; }
             if (recordBar != null) { recordBar.Close(); recordBar = null; }
             recorder = null;
-            btnRecord.Text = RecordText;
             if (frameWindow != null) frameWindow.ShowIdle(); // 틀은 그대로 두어 같은 자리에서 또 녹화할 수 있다
             Done();
 

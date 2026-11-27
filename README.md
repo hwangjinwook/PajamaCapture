@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/hwangjinwook/PajamaCapture/releases/latest"><img src="https://img.shields.io/badge/%EC%B5%9C%EC%8B%A0%20%EB%B2%84%EC%A0%84-v1.2.0-ff7aa2" alt="최신 버전 v1.2.0"></a>
+  <a href="https://github.com/hwangjinwook/PajamaCapture/releases/latest"><img src="https://img.shields.io/badge/%EC%B5%9C%EC%8B%A0%20%EB%B2%84%EC%A0%84-v1.2.1-ff7aa2" alt="최신 버전 v1.2.1"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-ff9cb8" alt="Windows 10, 11">
   <img src="https://img.shields.io/badge/%EC%84%A4%EC%B9%98-%ED%95%84%EC%9A%94%20%EC%97%86%EC%9D%8C-ffb8cb" alt="설치 필요 없음">
 </p>
@@ -51,7 +51,7 @@
 <tr><td nowrap>범위 고치기</td><td>분홍 손잡이를 끌어 크기, 범위 안쪽을 끌어 위치. 화살표 1점 이동, <code>Shift</code>+화살표 1점 크기</td></tr>
 <tr><td nowrap>저장하며 찍기</td><td>범위를 정한 뒤 <b>저장…</b> → 위치·이름·형식(PNG·JPG·BMP) 고르기</td></tr>
 <tr><td nowrap>창 캡쳐</td><td><b>창 캡쳐</b> → 찍을 창을 클릭(바탕 화면을 누르면 그 모니터 전체)</td></tr>
-<tr><td nowrap>바로 녹화</td><td><b>● 녹화</b> → 범위를 끌거나 창을 클릭 → <b>● 녹화 시작</b>(<code>Enter</code>) → 막대의 <b>■ 정지</b></td></tr>
+<tr><td nowrap>끌어서 바로 녹화</td><td><b>영역 캡쳐</b> → 범위를 끌거나 창을 클릭 → 도구 막대의 <b>● 녹화</b> → 녹화 막대의 <b>■ 정지</b></td></tr>
 <tr><td nowrap>틀 띄우고 녹화</td><td><b>▣ 녹화 틀</b> → 틀을 옮기고 크기 맞추기 → 막대의 <b>● 녹화</b> → <b>■ 정지</b> (아래 「🖼 녹화 틀」)</td></tr>
 <tr><td nowrap>녹화 설정</td><td>형식(GIF·MP4), 초당 장면(10·15·20·30), 마우스 커서 포함</td></tr>
 <tr><td nowrap>녹화 고치기</td><td>녹화 알림의 <b>편집하기</b>, 메인 창 <b>최근 녹화</b>·<b>파일 열기…</b>, 또는 GIF·MP4 를 메인 창에 끌어다 놓기</td></tr>
@@ -98,7 +98,8 @@
 
 <table>
 <tr><th nowrap>버전</th><th nowrap>배포일</th><th>내용</th></tr>
-<tr><td nowrap><b>v1.2.0</b></td><td nowrap>2026-11-27</td><td>🖼 녹화 틀(꿀캠 방식) — 틀을 먼저 띄워 옮기고 크기를 맞춘 뒤 녹화<br>크기 표시·정해진 크기 메뉴, 녹화 중 크기 잠금, MP4 는 짝수 크기로</td></tr>
+<tr><td nowrap><b>v1.2.1</b></td><td nowrap>2026-11-27</td><td>메인 창의 「● 녹화(끌어서 범위)」 버튼을 뺌 — 같은 일은 <b>영역 캡쳐</b> 도구 막대의 <b>● 녹화</b>로 해요</td></tr>
+<tr><td nowrap>v1.2.0</td><td nowrap>2026-11-27</td><td>🖼 녹화 틀(꿀캠 방식) — 틀을 먼저 띄워 옮기고 크기를 맞춘 뒤 녹화<br>크기 표시·정해진 크기 메뉴, 녹화 중 크기 잠금, MP4 는 짝수 크기로</td></tr>
 <tr><td nowrap>v1.1.0</td><td nowrap>2026-11-08</td><td>✂️ 간단 편집 — GIF 프레임 솎기·삭제·시간·캔버스 크기·영역 잘라내기, MP4 크기 바꾸기</td></tr>
 <tr><td nowrap>v1.0.1</td><td nowrap>2026-11-07</td><td>찍기 전 기다림(타이머) 설정을 빼고, 창 오른쪽 위에 버전 표시</td></tr>
 <tr><td nowrap>v1.0.0</td><td nowrap>2026-11-07</td><td>첫 버전 — 영역 캡쳐·창 캡쳐·GIF/MP4 녹화</td></tr>
